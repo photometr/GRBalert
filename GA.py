@@ -22,12 +22,6 @@ import webbrowser
 from GenHTML import GenHTML
 import ConfigParser
 
-url = "http://skyalert.org/feeds/144"
-htmlfile = "FindingChart.html"
-aboutfile = "About.html"
-timeout = 600
-
-
 config = ConfigParser.RawConfigParser()
 config.read('config.cfg')
 

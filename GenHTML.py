@@ -1,4 +1,5 @@
 import sidereal
+# -*- coding: utf-8 -*-
 
 s1 = '''
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -167,11 +168,21 @@ s12 = """
     <br>
     <a href="http://cas.sdss.org/dr7/en/tools/chart/chart.asp">SDSS Finding Chart</a>
     <br>
+    <a href="http://archive.stsci.edu/cgi-bin/dss_form">DSS Finding Chart</a>
+    <br>
     <a href="http://www.skyalert.org/">SkyAlert</a>
   </td>
 </tr>
 </table>
-
+<br>
+<H2>DSS image (15'x15')</H2>
+"""
+s13 = """
+<IMG SRC="http://archive.stsci.edu/cgi-bin/dss_search?v=poss2ukstu_red&r=
+"""
+s14 = """&e=J2000&h=15.0&w=15.0&f=gif&c=none&fov=NONE&v3=">
+"""
+s15 = """
 </body>
 </html>
 """
@@ -180,12 +191,13 @@ def GenHTML(datestr,RA,DEC,nicedate,h,secz):
     RAlist = dms.singleToMix( RA/15.0 )
     DEClist = dms.singleToMix( DEC )
     RAnice = str(RAlist[0])+"h "+str(RAlist[1])+"m "+str(RAlist[2])+"s"
-    DECnice = str(DEClist[0])+"d "+str(DEClist[1])+"m "+str(DEClist[2])+"s"
+    DECnice = str(DEClist[0])+"° "+str(DEClist[1])+"' "+str(DEClist[2])+'"'
     s = s1 + datestr + s2 + str(RA) + "&dec=" + str(DEC) + s3
     s = s + datestr + s4 + datestr + s5 #FIXME second is updated
     s = s + str(RA) + s6 + str(DEC) + s7 + nicedate
     s = s + s8 + RAnice + s9 + DECnice + s10
     s = s + str(h) + s11 + str(secz) + s12
+    s = s + s13 + str(RA) + "&d=" + str(DEC) + s14 + s15
     fop = open("FindingChart.html","w")
     fop.write(s)
     fop.close()
