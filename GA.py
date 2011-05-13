@@ -1,3 +1,4 @@
+#!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
 Created on Fri Apr 29 23:10:44 2011
@@ -19,15 +20,26 @@ from datetime import datetime
 import sidereal
 import webbrowser
 from GenHTML import GenHTML
+import ConfigParser
 
 url = "http://skyalert.org/feeds/144"
 htmlfile = "FindingChart.html"
 aboutfile = "About.html"
-timeout = 130
-alt_limit = 10 #degrees above horizon
-longitude = 29.8259495 #FIXME
-latitude = 59.880874 #FIXME
-altitude = 65 #m
+timeout = 600
+
+
+config = ConfigParser.RawConfigParser()
+config.read('config.cfg')
+
+longitude = config.getfloat('location', 'longitude')
+latitude = config.getfloat('location', 'latitude')
+altitude = config.getfloat('location', 'altitude')
+alt_limit = config.getfloat('GRBparams', 'alt_limit')
+timeout = config.getint('scanparams', 'timeout')
+url = config.get('scanparams', 'swifturl')
+htmlfile = config.get('info', 'htmlfile')
+aboutfile = config.get('info', 'aboutfile')
+usefermi = config.getboolean('scanparams', 'usefermi')
 
 class Event():
     def __init__(self):
