@@ -72,7 +72,7 @@ def GetData(obj):
     except URLError, e:
         log(e)
         obj.SetWarn()
-        return ""
+        return " "
     else:
         return s
 
@@ -157,6 +157,7 @@ def Update(obj):
 
 class TerminalViewer(QtGui.QWidget):
     def __init__(self,app,parent=None):
+        desk = QtGui.QApplication.desktop() #remove hanging on Windows shutdown
         QtGui.QWidget.__init__(self,parent)
         self.Label = QtGui.QLabel("Waiting for Something",self)
         self.trayIcon = QtGui.QSystemTrayIcon(QtGui.QIcon("green.png"), app)

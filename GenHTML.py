@@ -62,6 +62,7 @@ s2 = """");
 </tr>
 <tr>
   <td width="50%">
+  <H2>SDSS image (7'x5.5') прямое!!!</H2>
     <IMG SRC="http://casjobs.sdss.org/ImgCutoutDR7/getjpeg.aspx?ra=
 """
 s3 = """&scale=0.6&width=700&height=550">
@@ -175,7 +176,7 @@ s12 = """
 </tr>
 </table>
 <br>
-<H2>DSS image (15'x15')</H2>
+<H2>DSS image (15'x15') прямое!!!</H2>
 """
 s13 = """
 <IMG SRC="http://archive.stsci.edu/cgi-bin/dss_search?v=poss2ukstu_red&r=
