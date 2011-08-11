@@ -136,7 +136,7 @@ class Handler():
              if parent.tag == "entry":
                  ev = Event()
                  for i in range(len(parent)):
-                     if parent[i].tag == "published":
+                     if parent[i].tag == "updated":
                          ev.datestr = parent[i].text
                      if parent[i].tag == "ra":
                          ev.SetRA(parent[i].text)
@@ -209,9 +209,100 @@ class TerminalX(QtCore.QThread):
             print "################################################"
 
 
+class MainWindow(QtGui.QMainWindow):
+        def __init__(self, tv, win_parent = None):
+		#Init the base class
+		self.tv = tv
+		QtGui.QMainWindow.__init__(self, win_parent)
+		self.create_widgets()
+		traySignal = "activated(QSystemTrayIcon::ActivationReason)"
+		QtCore.QObject.connect(self.tv.trayIcon, QtCore.SIGNAL(traySignal), self.__icon_activated)
+
+	def create_widgets(self):
+		#Widgets
+                self.movie_screen = QtGui.QLabel()
+	        self.movie_screen.setSizePolicy(QtGui.QSizePolicy.Expanding, 
+                                                QtGui.QSizePolicy.Expanding)        
+                self.movie_screen.setAlignment(QtCore.Qt.AlignCenter)
+                self.movie = QtGui.QMovie("anim.gif", QtCore.QByteArray(), self) 
+                self.movie.setCacheMode(QtGui.QMovie.CacheAll) 
+                self.movie.setSpeed(100) 
+                self.movie_screen.setMovie(self.movie) 
+                self.movie.start()
+		self.label = QtGui.QLabel("SWIFT GRB alert")
+		self.label.setAlignment(QtCore.Qt.AlignCenter)
+		self.last_button = QtGui.QPushButton("Show Last GRB")
+		self.info_button = QtGui.QPushButton("Info")
+		self.reset_button = QtGui.QPushButton("Reset")
+		self.config_button = QtGui.QPushButton("Configure")
+		self.quit_button = QtGui.QPushButton("Quit program")
+		self.setWindowTitle("GRB Alert")
+		#connect signals
+		QtCore.QObject.connect(self.last_button,
+		        QtCore.SIGNAL("clicked()"),
+		        self.on_last_clicked)
+		QtCore.QObject.connect(self.info_button,
+			QtCore.SIGNAL("clicked()"),
+			self.on_info_clicked)
+		QtCore.QObject.connect(self.reset_button,
+			QtCore.SIGNAL("clicked()"),
+			self.on_reset_clicked)
+		QtCore.QObject.connect(self.config_button,
+			QtCore.SIGNAL("clicked()"),
+			self.on_config_clicked)
+		QtCore.QObject.connect(self.quit_button,
+			QtCore.SIGNAL("clicked()"),
+			QtGui.qApp,
+			QtCore.SLOT('quit()'))
+
+
+		#vert layout
+		v_box = QtGui.QVBoxLayout()
+		v_box.addWidget(self.movie_screen)
+		v_box.addWidget(self.label)
+		v_box.addWidget(self.last_button)
+		v_box.addWidget(self.info_button)
+		v_box.addWidget(self.reset_button)
+		v_box.addWidget(self.config_button)
+		v_box.addWidget(self.quit_button)
+		#Create central widget, add layout and set
+		central_widget = QtGui.QWidget()
+		central_widget.setLayout(v_box)
+		self.setCentralWidget(central_widget)
+
+	def on_last_clicked(self):
+		self.tv.ShowLast()
+	def on_info_clicked(self):
+		self.tv.ShowAbout()
+	def on_reset_clicked(self):
+		self.tv.UnsetAlert()
+	def on_config_clicked(self):
+		webbrowser.open("config.cfg")
+	def okayToClose(self): return False
+	def closeEvent(self, event):
+		if self.okayToClose(): 
+		  #user asked for exit
+		  self.tv.trayIcon.hide()
+		  event.accept()
+		else:
+		  #"minimize"
+		  self.hide()
+		  self.tv.trayIcon.show()
+		  event.ignore()
+
+	def __icon_activated(self, reason):
+	        self.setGeometry(600, 400, 250, 150)
+		if reason == QtGui.QSystemTrayIcon.DoubleClick:
+		  self.show()
+		if reason == QtGui.QSystemTrayIcon.Trigger:
+		  self.show()
+		if reason == QtGui.QSystemTrayIcon.MiddleClick:
+		  self.show()
+
 def main():
     app = QtGui.QApplication(sys.argv)
     qb = TerminalViewer(app)
+    main_window = MainWindow(qb)
     sys.exit(app.exec_())
 
 
