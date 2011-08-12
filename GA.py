@@ -41,6 +41,8 @@ class Event():
         self.date = 0
         self.RA = 0
         self.DEC = 0
+        self.link = ""
+        self.telescope = ""
     def __ne__(self,other):
         return self.datestr.__ne__(other.datestr)
     def __eq__(self,other):
@@ -58,13 +60,15 @@ class Event():
         day = self.datestr.split("T")[0]
         timestr = self.datestr.split("T")[1].rstrip("Z")
         return day + " " + timestr
+    def SetLink(self,link):
+        self.link = link
 
 def log(message):
     fop = open("GA.log",'a')
     fop.write(str(message))
     fop.close()
 
-def GetData(obj):
+def GetData(obj,url):
     try:
         f = urlopen(url)
         s = f.read()
@@ -76,7 +80,7 @@ def GetData(obj):
     else:
         return s
 
-def GetData1(obj):
+def GetData1(obj,url):
     fop = open("ex.xml",'r')
     s = fop.read()
     fop.close()
@@ -118,10 +122,19 @@ class Handler():
         
         if h > alt_limit or flag:
             nicedate = ev.GetFormDate()
-	    GenHTML(ev.datestr,ev.RA,ev.DEC,nicedate,h,secz)        
+	    GenHTML(ev.datestr,ev.RA,ev.DEC,nicedate,h,secz,ev.telescope)
+	    if ev.link != "":
+	      webbrowser.open_new_tab(ev.link)
 	    webbrowser.open_new_tab(os.path.join(os.getcwd(),htmlfile))
         if not flag:        
             obj.SetAlert()
+            gotUVOT = False
+            while not gotUVOT:
+	      # updating and parsing
+	      # until not received UVOT position
+	      data = GetData(obj,ev.link)
+	      gotUVOT = self.ParseUVOT(data,obj)
+	      time.sleep(10)
     def ShowLast(self,obj):
         ev = Handler.EventList[-1]
         for event in Handler.EventList:
@@ -142,6 +155,11 @@ class Handler():
                          ev.SetRA(parent[i].text)
                      if parent[i].tag == "dec":
                          ev.SetDEC(parent[i].text)
+                         ev.telescope = "BAT position"
+                     if parent[i].tag == "link":
+		         if parent[i].attrib["rel"] == "alternate":
+			   # link to page with all info about the event
+			   ev.SetLink(parent[i].attrib["href"])
                  if (ev not in Handler.EventList) and Handler.FirstParsing:
                      Handler.EventList.append(ev)
                  elif ev not in Handler.EventList:
@@ -149,9 +167,38 @@ class Handler():
                      flag = False #called not from GUI
                      self.RiseAlert(obj,ev,flag)
         Handler.FirstParsing = False
+    def ParseUVOT(self,data, obj):
+        gotUVOT = False
+        repl_data = data.replace("&lt;","<")
+        data = repl_data.replace("&gt;",">")
+        pars = lxml.html.etree.HTMLParser()
+        tree = lxml.html.etree.parse(StringIO(data),pars)
+        for parent in tree.getiterator():
+	  if parent.tag == "voevent":
+	    if "UVOT_Pos_" in parent.attrib["ivorn"]:
+	      data = lxml.html.etree.tostring(parent[2], pretty_print=True)
+	      gotUVOT = True
+        repl_data = data.replace("\\r\\n', '    ","")
+        pars = lxml.html.etree.HTMLParser()
+        tree = lxml.html.etree.parse(StringIO(repl_data),pars)
+        ev = Event()
+        for parent in tree.getiterator():
+	  if parent.tag == "isotime":
+	    ev.datestr = parent.text.strip()
+	  if parent.tag == "c1":
+	    ev.SetRA(parent.text.strip())
+	  if parent.tag == "c2":
+	    ev.SetDEC(parent.text.strip())
+	    ev.telescope = "UVOT position"
+	if gotUVOT:
+	  self.RiseAlert(obj,ev, True)
+	  return gotUVOT
+	else:
+	  return gotUVOT
 
 def Update(obj):
-    data = GetData(obj)
+    global url
+    data = GetData(obj,url)
     SaveData(data)
     Handler(obj,data)
 

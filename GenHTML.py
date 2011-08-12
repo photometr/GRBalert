@@ -120,7 +120,8 @@ s2 = """");
 <table border="0" cellpadding="5" cellspacing="5" width="100%">
 <tr>
   <th colspan="2">
-    <H1>Swift GRB Alert</H1>
+    <H1>Swift GRB Alert <font color="red">"""
+s3 = """</font></H1>
   </th>
 </tr>
 <tr>
@@ -133,7 +134,7 @@ s2 = """");
 <input type="button" onclick="window.location.reload()" value="reset"/></br>
     <IMG SRC="http://casjobs.sdss.org/ImgCutoutDR7/getjpeg.aspx?ra=
 """
-s3 = """&scale=0.6&width=700&height=550" id="sdss" alt="sdss finding chart">
+s4 = """&scale=0.6&width=700&height=550" id="sdss" alt="sdss finding chart">
   </td>
   <td>
     <table border="0" cellpadding="1" cellspacing="1" width="100%">
@@ -143,7 +144,7 @@ s3 = """&scale=0.6&width=700&height=550" id="sdss" alt="sdss finding chart">
 	</td>
 	<td>
 """
-s4 = """</td>
+s5 = """</td>
       </tr>
       <tr>
 	<td width="25%">
@@ -151,7 +152,7 @@ s4 = """</td>
 	</td>
 	<td>
 """
-s5 = """</td>
+s6 = """</td>
       </tr>
       <tr>
 	<td width="25%">
@@ -159,7 +160,7 @@ s5 = """</td>
 	</td>
 	<td>
 """
-s6 = """&#176;
+s7 = """&#176;
 	</td>
       </tr>
       <tr>
@@ -168,7 +169,7 @@ s6 = """&#176;
 	</td>
 	<td>
 """
-s7 = """&#176;
+s8 = """&#176;
 	</td>
       </tr>
     </table>
@@ -181,7 +182,7 @@ s7 = """&#176;
 	</td>
 	<td>
 """
-s8 = """</td>
+s9 = """</td>
       </tr>
       <tr>
 	<td width="25%">
@@ -205,7 +206,7 @@ s8 = """</td>
 	</td>
 	<td>
 """
-s9 = """</td>
+s10 = """</td>
       </tr>
       <tr>
 	<td width="25%">
@@ -213,7 +214,7 @@ s9 = """</td>
 	</td>
 	<td>
 """
-s10 = """</td>
+s11 = """</td>
       </tr>
       <tr>
 	<td width="25%">
@@ -221,7 +222,7 @@ s10 = """</td>
 	</td>
 	<td>
 """
-s11 = """&#176;
+s12 = """&#176;
 	</td>
       </tr>
       <tr>
@@ -230,7 +231,7 @@ s11 = """&#176;
 	</td>
 	<td>
 """
-s12 = """
+s13 = """
 </td>
       </tr>
     </table>
@@ -250,12 +251,12 @@ s12 = """
 <input type="button" onclick="rotate155();" value="+25 W"/>
 <input type="button" onclick="window.location.reload()" value="reset"/></br>
 """
-s13 = """
+s14 = """
 <IMG SRC="http://archive.stsci.edu/cgi-bin/dss_search?v=poss2ukstu_red&r=
 """
-s14 = """&e=J2000&h=15.0&w=15.0&f=gif&c=none&fov=NONE&v3=" id="dss" alt="dss finding chart"></br>
+s15 = """&e=J2000&h=15.0&w=15.0&f=gif&c=none&fov=NONE&v3=" id="dss" alt="dss finding chart"></br>
 """
-s15 = """
+s16 = """
 <a name="buttoncomm">Кнопки имеют следующее значение</a></br>
 Загружаемое изображение это отражённая относительно вертикальной оси картинка с SDSS/DSS, т.е. так видно в CCDops при нулевом повороте камеры, когда телескоп с Востока.</br>
 Кнопка <input type="button" value="W"/> поворачивает его на 180&#176;, т.е. так как будет видно в CCDops при нулевом повороте камеры, когда телескоп с Запада.</br>
@@ -265,18 +266,18 @@ s15 = """
 </body>
 </html>
 """
-def GenHTML(datestr,RA,DEC,nicedate,h,secz):
+def GenHTML(datestr,RA,DEC,nicedate,h,secz,telescope):
     dms = sidereal.MixedUnits( (60,60) )
     RAlist = dms.singleToMix( RA/15.0 )
     DEClist = dms.singleToMix( DEC )
     RAnice = str(RAlist[0])+"h "+str(RAlist[1])+"m "+str(RAlist[2])+"s"
     DECnice = str(DEClist[0])+"° "+str(DEClist[1])+"' "+str(DEClist[2])+'"'
-    s = s1 + datestr + s2 + str(RA) + "&dec=" + str(DEC) + s3
-    s = s + datestr + s4 + datestr + s5 #FIXME second is updated
-    s = s + str(RA) + s6 + str(DEC) + s7 + nicedate
-    s = s + s8 + RAnice + s9 + DECnice + s10
-    s = s + str(h) + s11 + str(secz) + s12
-    s = s + s13 + str(RA) + "&d=" + str(DEC) + s14 + s15
+    s = s1 + datestr + s2+ telescope + s3 + str(RA) + "&dec=" + str(DEC) + s4
+    s = s + datestr + s5 + datestr + s6 #FIXME second is updated
+    s = s + str(RA) + s7 + str(DEC) + s8 + nicedate
+    s = s + s9 + RAnice + s10 + DECnice + s11
+    s = s + str(h) + s12 + str(secz) + s13
+    s = s + s14 + str(RA) + "&d=" + str(DEC) + s15 + s16
     fop = open("FindingChart.html","w")
     fop.write(s)
     fop.close()
