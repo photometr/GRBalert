@@ -5,7 +5,7 @@ from distutils.core import setup
 import py2exe
 
 MyData_Files = ['config.cfg','green.png','red.png','yellow.png',
-                'anim.gif','About.html',
+                'anim.gif','About.html', 'WhatShouldIDo.html',
                 'fliph.js','pixastic.core.js','rotate.js']
 
 

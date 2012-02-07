@@ -1,8 +1,7 @@
 import sidereal
 # -*- coding: utf-8 -*-
 
-s1 = '''
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+s1 = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -84,6 +83,7 @@ s2 = """");
   <th colspan="2">
     <H1>Swift GRB Alert <font color="red">"""
 s3 = """</font></H1>
+     <a href="WhatShouldIDo.html">Как навестись и что снимать?</a>
   </th>
 </tr>
 <tr>
