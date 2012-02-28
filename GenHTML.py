@@ -196,6 +196,8 @@ s13 = """
       </tr>
     </table>
     <br>
+    <a href="http://gcn.gsfc.nasa.gov/gcn3_archive.html">GCN Circulars</a>
+    <br>
     <a href="http://cas.sdss.org/dr7/en/tools/chart/chart.asp">SDSS Finding Chart</a>
     <br>
     <a href="http://archive.stsci.edu/cgi-bin/dss_form">DSS Finding Chart</a>
@@ -222,15 +224,21 @@ s16 = """
 </body>
 </html>
 """
-def GenHTML(datestr,RA,DEC,nicedate,h,secz,telescope):
+def GenHTML(datestr,RA,DEC,nicedate,h,secz,telescope,pos_err):
+    if pos_err is None:
+      RADEC_err_min = "<font color='red'>   ± ?</font>"
+      Err = " ± ?"
+    else:
+      RADEC_err_min = "<font color='red'>   ± "+str(round(pos_err*60,2))+"'</font>"
+      Err = " ± "+ str(pos_err)
     dms = sidereal.MixedUnits( (60,60) )
     RAlist = dms.singleToMix( RA/15.0 )
     DEClist = dms.singleToMix( DEC )
-    RAnice = str(RAlist[0])+"h "+str(RAlist[1])+"m "+str(RAlist[2])+"s"
-    DECnice = str(DEClist[0])+"° "+str(DEClist[1])+"' "+str(DEClist[2])+'"'
+    RAnice = str(RAlist[0])+"h "+str(RAlist[1])+"m "+str(int(round(RAlist[2])))+"s"+ RADEC_err_min
+    DECnice = str(DEClist[0])+"° "+str(DEClist[1])+"' "+str(int(round(DEClist[2])))+'"'+ RADEC_err_min
     s = s1 + datestr + s2+ telescope + s3 + str(RA) + "&dec=" + str(DEC) + s4
     s = s + datestr + s5 + datestr + s6 #FIXME second is updated
-    s = s + str(RA) + s7 + str(DEC) + s8 + nicedate
+    s = s + str(RA) + Err + s7 + str(DEC) + Err + s8 + nicedate
     s = s + s9 + RAnice + s10 + DECnice + s11
     s = s + str(h) + s12 + str(secz) + s13
     s = s + s14 + str(RA) + "&d=" + str(DEC) + s15 + s16
