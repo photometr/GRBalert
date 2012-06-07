@@ -146,7 +146,7 @@ class Handler():
              if parent.tag == "entry":
                  ev = Event()
                  for i in range(len(parent)):
-                     if parent[i].tag == "updated":
+                     if parent[i].tag == "published":
                          ev.datestr = parent[i].text
                      if parent[i].tag == "ra":
                          ev.SetRA(parent[i].text)

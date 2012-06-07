@@ -58,10 +58,15 @@ class Event():
                        61  : "SWIFT_BAT_GRB_POS",
                        67  : "SWIFT_XRT_POS",
                        81  : "SWIFT_UVOT_POS",
+                       82  : "SWIFT_BAT_GRB_POS_TEST",##############################
                        101 : "SuperAGILE_GRB_POS_GROUND",
                        102 : "SuperAGILE_GRB_POS_REFINED",
+                       109 : "AGILE_GRB_POS_TEST",##################################
                        112 : "FERMI_GBM_GND_POS",
-                       134 : "MAXI_UNKNOWN_SOURCE"
+                       119 : "FERMI_GBM_GRB_POS_TEST",#############################
+                       124 : "FERMI_LAT_GRB_POS_TEST",##############################
+                       134 : "MAXI_UNKNOWN_SOURCE",
+                       136 : "MAXI_TEST"#######################################
                      }
     def __ne__(self,other):
         return self.datestr.__ne__(other.datestr)
