@@ -1,0 +1,6 @@
+*.pyc
+*.xml
+*.dll
+*.gz
+*.log
+FindingChart.html

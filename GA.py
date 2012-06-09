@@ -12,236 +12,24 @@ from PyQt4.QtCore import SIGNAL
 from PyQt4 import QtCore
 import time
 import math
-import lxml.html
 from datetime import datetime
-import sidereal
 import webbrowser
 from GenHTML import GenHTML
-import ConfigParser
 import threading
-import socket
-from skyalert import *
+import router
+import voevent
+import config
 
 
-class Config():
-    def __init__(self):
-      config = ConfigParser.RawConfigParser()
-      config.read('config.cfg')
-
-      self.longitude = config.getfloat('location', 'longitude')
-      self.latitude = config.getfloat('location', 'latitude')
-      self.altitude = config.getfloat('location', 'altitude')
-      self.coorerr = config.getfloat('location', 'coorerr')
-      self.alt_limit = config.getfloat('GRBparams', 'alt_limit')
-      self.timeout = config.getint('scanparams', 'timeout')
-      self.url = config.get('scanparams', 'swifturl')
-      self.htmlfile = config.get('info', 'htmlfile')
-      self.aboutfile = config.get('info', 'aboutfile')
-      self.usefermi = config.getboolean('scanparams', 'usefermi')
-      self.socketip = config.get('scanparams', 'socketip')
-      self.socketport = config.getint('scanparams', 'socketport')
-      self.datalength = config.getint('scanparams', 'datalength')
-      
-class Event():
-    def __init__(self):
-        self.datestr = ""
-        self.date = 0
-        self.RA = 0
-        self.DEC = 0
-        self.Cerr = 0
-        self.link = ""
-        self.telescope = ""
-        self.etype = 0 #3   : "Imalive",
-        self.types = { 53  : "INTEGRAL_WAKEUP",
-                       54  : "INTEGRAL_REFINED",
-                       55  : "INTEGRAL_OFFLINE",
-                       61  : "SWIFT_BAT_GRB_POS",
-                       67  : "SWIFT_XRT_POS",
-                       81  : "SWIFT_UVOT_POS",
-                       82  : "SWIFT_BAT_GRB_POS_TEST",##############################
-                       101 : "SuperAGILE_GRB_POS_GROUND",
-                       102 : "SuperAGILE_GRB_POS_REFINED",
-                       109 : "AGILE_GRB_POS_TEST",##################################
-                       112 : "FERMI_GBM_GND_POS",
-                       119 : "FERMI_GBM_GRB_POS_TEST",#############################
-                       124 : "FERMI_LAT_GRB_POS_TEST",##############################
-                       134 : "MAXI_UNKNOWN_SOURCE",
-                       136 : "MAXI_TEST"#######################################
-                     }
-    def __ne__(self,other):
-        return self.datestr.__ne__(other.datestr)
-    def __eq__(self,other):
-        return self.datestr.__eq__(other.datestr)
-    def CalcDate(self):
-        pass #self.datestr
-    def SetRA(self,RA):
-        self.RA = float(RA)
-    def SetDEC(self,DEC):
-        self.DEC = float(DEC)
-    def SetCerr(self,Cerr):
-        self.Cerr = float(Cerr)
-    def SetType(self,typ):
-        self.etype = int(typ)
-        if self.types.has_key(self.etype):
-	  self.telescope = self.types[self.etype]
-	else:
-	  self.telescope = "Not interesting"
-    def IsInteresting(self):
-        return self.types.has_key(self.etype)
-    def GetDate(self):
-        date = self.datestr.rstrip("Z").split(".")[0]
-        return datetime.strptime(date,"%Y-%m-%dT%H:%M:%S")
-    def GetFormDate(self):
-        day = self.datestr.split("T")[0]
-        timestr = self.datestr.split("T")[1].rstrip("Z")
-        return day + " " + timestr
-    def SetLink(self,link):
-        self.link = link
-
-def log(message):
-    fop = open("GA.log",'a')
-    fop.write(str(message)+"\n")
-    fop.close()
-
-
-class GCNHandler():
-    def __init__(self, obj, data, conf):
-        self.conf = conf
-        fop = open("latest_packet.xml",'w')
-        print data
-        fop.write(data)
-        fop.close()
-        self.Parse(obj, data)
-    def CalcAlt(self,ev):
-        curtime = datetime.now()
-        Gst = sidereal.SiderealTime.fromDatetime(curtime)
-        Lst = Gst.lst(math.radians(self.conf.longitude))
-        Lst = Lst.hours * 15 #local siderial time - in degrees
-        hourangle = red_to_pos(Lst-ev.RA)
-        RADec = sidereal.RADec(math.radians(ev.RA), math.radians(ev.DEC))
-        AltAz = RADec.altAz(math.radians(hourangle*15.0), math.radians(self.conf.latitude))
-        return math.degrees(AltAz.alt)
-    def CheckCoordErr(self,ev):
-        if ev.Cerr < self.conf.coorerr:
-	  return True
-	else:
-	  return False
-    def RiseAlert(self,obj,ev,flag):
-        #flag show whether it's called from GUI
-        #ev.CalcDate()
-        h = round(self.CalcAlt(ev),2)
-        secz = round(1.0/math.cos(math.pi*0.5-math.radians(h)),2)
-        if not self.CheckCoordErr(ev):
-	    log(time.strftime("%d.%m %H:%M:%S")+' source position err is too big')
-	    return 0
-        if h > self.conf.alt_limit or flag:
-            nicedate = ev.GetFormDate()
-	    GenHTML(ev.datestr,ev.RA,ev.DEC,nicedate,h,secz,ev.telescope,ev.Cerr)
-	    if ev.link != "":
-	      webbrowser.open_new_tab(ev.link)
-	    webbrowser.open_new_tab(os.path.join(os.getcwd(),self.conf.htmlfile))
-        if not flag:        
-            obj.SetAlert()
-    def Parse(self,obj,data):
-      isVOEvent = False
-      pars = lxml.html.etree.HTMLParser()
-      tree = lxml.html.etree.parse(StringIO(data),pars)
-      for parent in tree.getiterator():
-        if parent.tag == "voevent":
-	  isVOEvent = True
-          ev = Event()
-      if not isVOEvent:
-	log(time.strftime("%d.%m %H:%M:%S")+' Caught not VO event')
-	return 0
-      for parent in tree.getiterator():
-	if parent.tag == "what":
-          for i in range(len(parent)):
-            if parent[i].tag == "param":
-	      if parent[i].attrib.get("name") == 'Packet_Type':
-		ev.SetType(parent[i].attrib.get("value"))
-		log(time.strftime("%d.%m %H:%M:%S")+' Caught event type '+str(ev.etype))
-		if not ev.IsInteresting():
-		  print "Bad"
-		  return 0
-      for parent in tree.getiterator():
-	if parent.tag == "position2d":
-	  for i in range(len(parent)):
-	    if parent[i].tag == "value2":
-	      ev.SetRA(parent[i][0].text)
-	      ev.SetDEC(parent[i][1].text)
-	    elif parent[i].tag == "error2radius":
-	      ev.SetCerr(parent[i].text)
-      for parent in tree.getiterator():
-	if parent.tag == "timeinstant":
-	  for i in range(len(parent)):
-	    if parent[i].tag == "isotime":
-	      ev.datestr = parent[i].text
-      self.RiseAlert(obj,ev,False)
-
-def recv_end(the_socket,conf):
-    End = "9Qhx5oxG0"
-    total_data=[];data=''
-    while True:
-            try:
-	      data=the_socket.recv(conf.datalength)
-	    except socket.error, msg:
-	      log(time.strftime("%d.%m %H:%M:%S")+' Could not open socket '+str(msg))
-	      return False
-            if data.endswith(End):
-                total_data.append(data[:data.find(End)])
-                break
-            total_data.append(data)
-            if len(total_data) > conf.datalength:
-	        return ''.join(total_data) #to prevent memory leak
-            if len(total_data)>1:
-                #check if end_of_data was split
-                last_pair=total_data[-2]+total_data[-1]
-                if End in last_pair:
-                    total_data[-2]=last_pair[:last_pair.find(End)]
-                    total_data.pop()
-                    break
-    return ''.join(total_data)
-
-def gcn_thread(obj):
-    global socketip, socketport
-    conf = Config()
-    while True:
-      for res in socket.getaddrinfo(conf.socketip, conf.socketport, socket.AF_INET, socket.SOCK_STREAM):
-	af, socktype, proto, canonname, sa = res
-	try:
-	  s = socket.socket(af, socktype, proto)
-	except socket.error, msg:
-	  log(time.strftime("%d.%m %H:%M:%S")+' Could not open socket '+str(msg))
-	  s = None
-	  continue
-	try:
-	  s.connect(sa)
-	  log(time.strftime("%d.%m %H:%M:%S")+' Connected to socket ')
-	except socket.error, msg:
-	  log(time.strftime("%d.%m %H:%M:%S")+' Could not open socket '+str(msg))
-	  s.close()
-	  s = None
-	  Update(obj,conf) #will use the old source of data
-	  time.sleep(conf.timeout)
-	  continue
-	break
-      if s is None:
-	log(time.strftime("%d.%m %H:%M:%S")+' Could not open socket')
-	continue
-      while True:
-	data = recv_end(s,conf) #s.recv(conf.datalength)
-	if data:
-	  print data
-	  GCNHandler(obj,data,conf)
-	else:# if GCN is disconnected from our router
-	  log(time.strftime("%d.%m %H:%M:%S")+' Disconnected from socket')
-	  Update(obj,conf) #will use the old source of data
-	  time.sleep(conf.timeout)
-	  break
+def startThreads(TerminalViewerInstance):
+   voeventthread = threading.Thread(name='voserver', target=voevent.voserver_thread, args=(TerminalViewerInstance,))
+   voeventthread.start()
+   #routerthread = threading.Thread(name='router', target=router.gcn_thread, args=(TerminalViewerInstance,))
+   #routerthread.start()
 
 class TerminalViewer(QtGui.QWidget):
     def __init__(self,app,parent=None):
-        self.conf = Config()
+        self.conf = config.Config()
         desk = QtGui.QApplication.desktop() #remove hanging on Windows shutdown
         QtGui.QWidget.__init__(self,parent)
         self.Label = QtGui.QLabel("Waiting for Something",self)
@@ -263,8 +51,7 @@ class TerminalViewer(QtGui.QWidget):
         self.aboutAction.connect(self.aboutAction, SIGNAL("triggered()"), self.ShowAbout)
         self.lastAction.connect(self.lastAction, SIGNAL("triggered()"), self.ShowLast)
         self.connect(self.DataCollector,QtCore.SIGNAL("UpdateData() "), self.UpdateData)
-        gcnthread = threading.Thread(name='gcn', target=gcn_thread, args=(self,))
-        gcnthread.start()
+        startThreads(self)
     def Activated(self,newtext):
         self.Label.setText(newtext)
     def SetWarn(self):
