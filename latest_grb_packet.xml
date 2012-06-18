@@ -1,0 +1,94 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<voe:VOEvent
+      ivorn="ivo://nasa.gsfc.gcn/SWIFT#Point_Dir_2012-06-18T15:00:00.00_1124147577-500"
+      role="utility" version="1.1"
+      xmlns:voe="http://www.ivoa.net/xml/VOEvent/v1.1"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xsi:schemaLocation="http://www.ivoa.net/xml/VOEvent/v1.1 http://www.ivoa.net/xml/VOEvent/VOEvent-v1.1.xsd" >
+  <Who>
+    <AuthorIVORN>ivo://nasa.gsfc.tan/gcn</AuthorIVORN>
+    <Author>
+      <shortName>VO-GCN</shortName>
+      <contactName>Scott Barthelmy</contactName>
+      <contactPhone>+1-301-286-3106</contactPhone>
+      <contactEmail>scott.barthelmy@nasa.gov</contactEmail>
+    </Author>
+    <Date>2012-06-18T14:59:35</Date>
+    <Description>This VOEvent message was created with GCN VOE version: 1.10 07jun12</Description>
+  </Who>
+  <What>
+    <Param name="Packet_Type"  value="81" />
+    <Param name="Pkt_Ser_Num"  value="125" />
+    <Param name="TrigID"       value="74105" ucd="meta.id" />
+    <Param name="Segment_Num"  value="67" ucd="meta.id.part" />
+    <Param name="Slew_TJD"     value="16096" unit="days" ucd="time" />
+    <Param name="Slew_SOD"     value="54000.00" unit="sec" ucd="time" />
+    <Param name="Slew_RA"      value="106.4177" unit="deg" ucd="pos.eq.ra" />
+    <Param name="Slew_Dec"     value="-20.0000" unit="deg" ucd="pos.eq.dec" />
+    <Param name="Slew_Roll"    value="334.2276" unit="deg" />
+    <Param name="BAT_Mode"     value="0x0" unit="dn" />
+    <Param name="XRT_Mode"     value="0x0" unit="dn" />
+    <Param name="UVOT_Mode"    value="0x9" unit="dn" />
+    <Param name="Misc_flags"   value="0x40000000" />
+    <Group name="Misc_Flags" >
+      <Param name="Near_Bright_Star"  value="false" />
+      <Param name="Flt_Generated"     value="false" />
+      <Param name="Gnd_Generated"     value="true" />
+    </Group>
+    <Param name="Coords_Type"   value="2" unit="dn" />
+    <Param name="Coords_String" value="pointing_direction" />
+    <Group name="Obs_Support_Info" >
+      <Description>The Sun and Moon values are valid at the time the VOEvent XML message was created.</Description>
+      <Param name="Sun_RA"        value="87.56" unit="deg" ucd="pos.eq.ra" />
+      <Param name="Sun_Dec"       value="23.42" unit="deg" ucd="pos.eq.dec" />
+      <Param name="Sun_Distance"  value="47.22" unit="deg" ucd="pos.angDistance" />
+      <Param name="Sun_Hr_Angle"  value="-1.27" unit="hr" />
+      <Param name="Moon_RA"       value="75.67" unit="deg" ucd="pos.eq.ra" />
+      <Param name="Moon_Dec"      value="21.80" unit="deg" ucd="pos.eq.dec" />
+      <Param name="MOON_Distance" value="51.58" unit="deg" ucd="pos.angDistance" />
+      <Param name="Moon_Illum"    value="0.92" unit="%" ucd="arith.ratio" />
+      <Param name="Galactic_Long" value="232.37" unit="deg" ucd="pos.galactic.lon" />
+      <Param name="Galactic_Lat"  value="-5.97" unit="deg" ucd="pos.galactic.lat" />
+      <Param name="Ecliptic_Long" value="111.03" unit="deg" ucd="pos.ecliptic.lon" />
+      <Param name="Ecliptic_Lat"  value="-42.25" unit="deg" ucd="pos.ecliptic.lat" />
+    </Group>
+    <Description>The soon-to-be pointing direction for the Swift spacecraft.</Description>
+  </What>
+  <WhereWhen>
+    <ObsDataLocation xmlns="http://www.ivoa.net/xml/STC/stc-v1.30.xsd">
+      <ObservatoryLocation xlink:href="ivo://STClib/Observatories#GEOLUN/" xlink:type="simple" id="GEOLUN" />
+      <ObservationLocation>
+        <AstroCoordSystem xlink:href="ivo://STClib/CoordSys#UTC-FK5-GEO/" xlink:type="simple" id="UTC-FK5-GEO" />
+        <AstroCoords coord_system_id="UTC-FK5-GEO">
+          <Time unit="s">
+            <TimeInstant>
+              <ISOTime>2012-06-18T15:00:00.00</ISOTime>
+            </TimeInstant>
+          </Time>
+          <Position2D unit="deg">
+            <Name1>RA</Name1>
+            <Name2>Dec</Name2>
+            <Value2>
+              <C1>106.4177</C1>
+              <C2>-20.0000</C2>
+            </Value2>
+            <Error2Radius>0.0000</Error2Radius>
+          </Position2D>
+        </AstroCoords>
+      </ObservationLocation>
+    </ObsDataLocation>
+  <Description>The RA,Dec coordinates are of the type: pointing_direction.</Description>
+  </WhereWhen>
+  <How>
+    <Description>Swift Satellite</Description>
+    <Reference uri="http://gcn.gsfc.nasa.gov/swift.html" type="url" />
+  </How>
+  <Why>
+    <Inference probability="1.00">
+      <Concept>Swift spacecraft slewing to a preplanned observing target.</Concept>
+    </Inference>
+  </Why>
+  <Description>
+  </Description>
+</voe:VOEvent>

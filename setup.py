@@ -6,7 +6,7 @@ import py2exe
 
 MyData_Files = ['config.cfg','green.png','red.png','yellow.png',
                 'anim.gif','About.html', 'WhatShouldIDo.html',
-                'fliph.js','pixastic.core.js','rotate.js']
+                'fliph.js','pixastic.core.js','rotate.js','latest_grb_packet.xml']
 
 
 setup(windows=[{"script":"GA.py"}],

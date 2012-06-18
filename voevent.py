@@ -10,6 +10,7 @@ import time
 from lxml import etree
 from StringIO import StringIO
 import threading
+import sys
 
 pktlen = 2048
 maxpktlen = 30000
@@ -52,7 +53,7 @@ def GUI_thread(obj,xml,conf):
   gcn.GCNHandler(obj,xml,conf)
   return
 
-def voserver_thread(obj):
+def voserver_thread(obj,StopThreadFlag):
   conf = config.Config()
   lastiamalive = time.time()
   socketipiter = itertools.cycle(conf.voeventips) #infinite iterator through the list
@@ -75,6 +76,9 @@ def voserver_thread(obj):
       continue
     log.log('Connected to '+ socketip)
     while True:
+      if StopThreadFlag[0]:
+	log.log('Program closed')
+	sys.exit(0)
       if (time.time() - lastiamalive) > imaldiff+2:
 	lastiamalive = time.time()
 	#try to connect to another server
@@ -83,7 +87,11 @@ def voserver_thread(obj):
         data = s.recv(4)
       except:
 	pass
-      dl = struct.unpack('>I', data)[0] #big-endian 4 byte int
+      try:
+	dl = struct.unpack('>I', data)[0] #big-endian 4 byte int
+      except:
+	log.log("Error: Unpack can't be made")
+	break
       if dl > 30000:
 	log.log("Too much data received = " + str(dl))
 	break

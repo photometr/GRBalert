@@ -22,8 +22,9 @@ def red_to_pos(hourang):
 class GCNHandler():
     def __init__(self, obj, data, conf):
         self.conf = conf
+        self.ev = event.Event()
         fop = open("latest_packet.xml",'w')
-        print data
+        #print data
         fop.write(data)
         fop.close()
         self.Parse(obj, data)
@@ -41,9 +42,10 @@ class GCNHandler():
 	  return True
 	else:
 	  return False
-    def RiseAlert(self,obj,ev,flag):
+    def RiseAlert(self,obj,flag):
         #flag show whether it's called from GUI
         #ev.CalcDate()
+        ev = self.ev
         h = round(self.CalcAlt(ev),2)
         secz = round(1.0/math.cos(math.pi*0.5-math.radians(h)),2)
         if not self.CheckCoordErr(ev):
@@ -91,5 +93,9 @@ class GCNHandler():
 	  for i in range(len(parent)):
 	    if parent[i].tag == "isotime":
 	      ev.datestr = parent[i].text
-      self.RiseAlert(obj,ev,False)
+	      self.ev = ev
+      fop = open("latest_grb_packet.xml",'w')
+      fop.write(data)
+      fop.close()
+      self.RiseAlert(obj,True)
  

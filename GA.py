@@ -19,13 +19,14 @@ import threading
 import router
 import voevent
 import config
+import gcn
 
 
-def startThreads(TerminalViewerInstance):
-   voeventthread = threading.Thread(name='voserver', target=voevent.voserver_thread, args=(TerminalViewerInstance,))
+def startThreads(TerminalViewerInstance,StopThreadFlag):
+   voeventthread = threading.Thread(name='voserver', target=voevent.voserver_thread, args=(TerminalViewerInstance,StopThreadFlag))
    voeventthread.start()
-   #routerthread = threading.Thread(name='router', target=router.gcn_thread, args=(TerminalViewerInstance,))
-   #routerthread.start()
+   routerthread = threading.Thread(name='router', target=router.gcn_thread, args=(TerminalViewerInstance,StopThreadFlag))
+   routerthread.start()
 
 class TerminalViewer(QtGui.QWidget):
     def __init__(self,app,parent=None):
@@ -46,12 +47,13 @@ class TerminalViewer(QtGui.QWidget):
         self.DataCollector.start()
 
         self.trayIcon.show()
-        self.exitAction.connect(self.exitAction, SIGNAL("triggered()"), app, SLOT("quit()"))
+        self.exitAction.connect(self.exitAction, SIGNAL("triggered()"), self.closeEvent)
         self.resetAction.connect(self.resetAction, SIGNAL("triggered()"), self.UnsetAlert)
         self.aboutAction.connect(self.aboutAction, SIGNAL("triggered()"), self.ShowAbout)
         self.lastAction.connect(self.lastAction, SIGNAL("triggered()"), self.ShowLast)
         self.connect(self.DataCollector,QtCore.SIGNAL("UpdateData() "), self.UpdateData)
-        startThreads(self)
+        self.StopThreadFlag = [False]
+        startThreads(self,self.StopThreadFlag)
     def Activated(self,newtext):
         self.Label.setText(newtext)
     def SetWarn(self):
@@ -65,11 +67,15 @@ class TerminalViewer(QtGui.QWidget):
     def ShowAbout(self):
         webbrowser.open_new_tab(os.path.join(os.getcwd(),self.conf.aboutfile))
     def ShowLast(self):
-        Update(self,self.conf)
-        Handler(self," ",self.conf).ShowLast(self,self.conf)
-    def closeEvent(self,e):
-        e.accept()
-        app.exit()
+        fop = open("latest_grb_packet.xml",'r')
+        xml = fop.read()
+        fop.close()
+        gcnh = gcn.GCNHandler(self,xml,self.conf)
+        gcnh.RiseAlert(self,True)
+    def closeEvent(self):
+        self.StopThreadFlag[0] = True
+        QtGui.qApp.quit()
+
 
 class TerminalX(QtCore.QThread):
     def __init__(self,parent=None):
@@ -178,7 +184,6 @@ def main():
     qb = TerminalViewer(app)
     main_window = MainWindow(qb)
     sys.exit(app.exec_())
-
 
 
 if __name__ == '__main__':
