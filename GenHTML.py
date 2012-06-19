@@ -1,8 +1,7 @@
 import sidereal
 # -*- coding: utf-8 -*-
 
-s1 = '''
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+s1 = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -14,28 +13,9 @@ s1 = '''
   <script type="text/javascript" src="./rotate.js"></script>
   <script type="text/javascript" src="./fliph.js"></script>
   <script type="text/javascript">
-  function sdss_hor_flip() {
-	  Pixastic.process(document.getElementById("sdss"), "fliph")
-  }
-  </script>
-  <script type="text/javascript">
-  function sdss_rotate180() {
-	  Pixastic.process(document.getElementById("sdss"), "rotate", {
-		  angle : 180
-	  });
-  }
-  </script>
-  <script type="text/javascript">
   function sdss_rotate25() {
 	  Pixastic.process(document.getElementById("sdss"), "rotate", {
 		  angle : -25
-	  });
-  }
-  </script>
-  <script type="text/javascript">
-  function sdss_rotate155() {
-	  Pixastic.process(document.getElementById("sdss"), "rotate", {
-		  angle : -155
 	  });
   }
   </script>
@@ -45,28 +25,9 @@ s1 = '''
   <script type="text/javascript" src="./rotate.js"></script>
   <script type="text/javascript" src="./fliph.js"></script>
   <script type="text/javascript">
-  function hor_flip() {
-	  Pixastic.process(document.getElementById("dss"), "fliph")
-  }
-  </script>
-  <script type="text/javascript">
-  function rotate180() {
-	  Pixastic.process(document.getElementById("dss"), "rotate", {
-		  angle : 180
-	  });
-  }
-  </script>
-  <script type="text/javascript">
   function rotate25() {
 	  Pixastic.process(document.getElementById("dss"), "rotate", {
 		  angle : -25
-	  });
-  }
-  </script>
-  <script type="text/javascript">
-  function rotate155() {
-	  Pixastic.process(document.getElementById("dss"), "rotate", {
-		  angle : -155
 	  });
   }
   </script>
@@ -116,21 +77,20 @@ s2 = """");
 </script>
 
 </head>
-<body onload="updateClock(); setInterval('updateClock()', 1000 );diffClock(); setInterval('diffClock()', 1000 );sdss_hor_flip();hor_flip()">
+<body onload="updateClock(); setInterval('updateClock()', 1000 );diffClock(); setInterval('diffClock()', 1000 );">
 <table border="0" cellpadding="5" cellspacing="5" width="100%">
 <tr>
   <th colspan="2">
     <H1>Swift GRB Alert <font color="red">"""
 s3 = """</font></H1>
+     <a href="WhatShouldIDo.html">Как навестись и что снимать?</a>
   </th>
 </tr>
 <tr>
   <td width="50%">
   <H2>SDSS image (7'x5.5')</H2>
   комментарии к кнопкам <a href="#buttoncomm">ниже</a></br>
-<input type="button" onclick="sdss_rotate180();" value="W"/>
-<input type="button" onclick="sdss_rotate25();" value="+25 E"/>
-<input type="button" onclick="sdss_rotate155();" value="+25 W"/>
+<input type="button" onclick="sdss_rotate25();" value="+25"/>
 <input type="button" onclick="window.location.reload()" value="reset"/></br>
     <IMG SRC="http://casjobs.sdss.org/ImgCutoutDR7/getjpeg.aspx?ra=
 """
@@ -236,6 +196,8 @@ s13 = """
       </tr>
     </table>
     <br>
+    <a href="http://gcn.gsfc.nasa.gov/gcn3_archive.html">GCN Circulars</a>
+    <br>
     <a href="http://cas.sdss.org/dr7/en/tools/chart/chart.asp">SDSS Finding Chart</a>
     <br>
     <a href="http://archive.stsci.edu/cgi-bin/dss_form">DSS Finding Chart</a>
@@ -246,9 +208,7 @@ s13 = """
 </table>
 <br>
 <H2>DSS image (15'x15')</H2> комментарии к кнопкам <a href="#buttoncomm">ниже</a></br>
-<input type="button" onclick="rotate180();" value="W"/>
-<input type="button" onclick="rotate25();" value="+25 E"/>
-<input type="button" onclick="rotate155();" value="+25 W"/>
+<input type="button" onclick="rotate25();" value="+25"/>
 <input type="button" onclick="window.location.reload()" value="reset"/></br>
 """
 s14 = """
@@ -259,22 +219,26 @@ s15 = """&e=J2000&h=15.0&w=15.0&f=gif&c=none&fov=NONE&v3=" id="dss" alt="dss fin
 s16 = """
 <a name="buttoncomm">Кнопки имеют следующее значение</a></br>
 Загружаемое изображение это отражённая относительно вертикальной оси картинка с SDSS/DSS, т.е. так видно в CCDops при нулевом повороте камеры, когда телескоп с Востока.</br>
-Кнопка <input type="button" value="W"/> поворачивает его на 180&#176;, т.е. так как будет видно в CCDops при нулевом повороте камеры, когда телескоп с Запада.</br>
-Кнопка <input type="button" value="+25 E"/> так будет в CCDops при повороте камеры +25&#176; если телескоп с Востока.</br>
-Кнопка <input type="button" value="+25 W"/> так будет в CCDops при повороте камеры +25&#176; если телескоп с Запада.</br>
+Кнопка <input type="button" value="+25"/> так будет в CCDops при повороте камеры +25&#176;.</br>
 Кнопка <input type="button" value="reset"/> сбрасывает в начальное положение.
 </body>
 </html>
 """
-def GenHTML(datestr,RA,DEC,nicedate,h,secz,telescope):
+def GenHTML(datestr,RA,DEC,nicedate,h,secz,telescope,pos_err):
+    if pos_err is None:
+      RADEC_err_min = "<font color='red'>   ± ?</font>"
+      Err = " ± ?"
+    else:
+      RADEC_err_min = "<font color='red'>   ± "+str(round(pos_err*60,2))+"'</font>"
+      Err = " ± "+ str(pos_err)
     dms = sidereal.MixedUnits( (60,60) )
     RAlist = dms.singleToMix( RA/15.0 )
     DEClist = dms.singleToMix( DEC )
-    RAnice = str(RAlist[0])+"h "+str(RAlist[1])+"m "+str(RAlist[2])+"s"
-    DECnice = str(DEClist[0])+"° "+str(DEClist[1])+"' "+str(DEClist[2])+'"'
+    RAnice = str(RAlist[0])+"h "+str(RAlist[1])+"m "+str(int(round(RAlist[2])))+"s"+ RADEC_err_min
+    DECnice = str(DEClist[0])+"° "+str(DEClist[1])+"' "+str(int(round(DEClist[2])))+'"'+ RADEC_err_min
     s = s1 + datestr + s2+ telescope + s3 + str(RA) + "&dec=" + str(DEC) + s4
     s = s + datestr + s5 + datestr + s6 #FIXME second is updated
-    s = s + str(RA) + s7 + str(DEC) + s8 + nicedate
+    s = s + str(RA) + Err + s7 + str(DEC) + Err + s8 + nicedate
     s = s + s9 + RAnice + s10 + DECnice + s11
     s = s + str(h) + s12 + str(secz) + s13
     s = s + s14 + str(RA) + "&d=" + str(DEC) + s15 + s16

@@ -5,8 +5,8 @@ from distutils.core import setup
 import py2exe
 
 MyData_Files = ['config.cfg','green.png','red.png','yellow.png',
-                'anim.gif','About.html',
-                'fliph.js','pixastic.core.js','rotate.js']
+                'anim.gif','About.html', 'WhatShouldIDo.html',
+                'fliph.js','pixastic.core.js','rotate.js','latest_grb_packet.xml']
 
 
 setup(windows=[{"script":"GA.py"}],
