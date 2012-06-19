@@ -4,6 +4,7 @@ import socket
 import log
 import gcn
 import sys
+import time
 
 sockettimeout = 60 #reconnects every N sec
 
