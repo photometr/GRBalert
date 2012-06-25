@@ -6,17 +6,7 @@ import gcn
 import sys
 import time
 
-sockettimeout = 60 #reconnects every N sec
-
-def recv_end(the_socket,conf):
-    data=''
-    while True:
-            try:
-	      data=the_socket.recv(conf.datalength)
-	    except socket.error, msg:
-	      log.log('Could not open socket '+str(msg))
-	      return False
-            return data
+sockettimeout = 300 #reconnects every N sec
 
 def gcn_thread(obj,StopThreadFlag):
     conf = config.Config()
@@ -47,7 +37,7 @@ def gcn_thread(obj,StopThreadFlag):
 	if StopThreadFlag[0]:
 	  log.log('Program closed')
 	  sys.exit(0)
-	data = recv_end(s,conf) #s.recv(conf.datalength)
+	data = s.recv(conf.datalength) #recv_end(s,conf)
 	if data:
 	  gcn.GCNHandler(obj,data,conf)
 	else:# if GCN is disconnected from our router
