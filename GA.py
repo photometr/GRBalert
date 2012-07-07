@@ -20,7 +20,7 @@ import router
 import voevent
 import config
 import gcn
-
+import log
 
 def startThreads(TerminalViewerInstance,StopThreadFlag):
    voeventthread = threading.Thread(name='voserver', target=voevent.voserver_thread, args=(TerminalViewerInstance,StopThreadFlag))
@@ -70,7 +70,7 @@ class TerminalViewer(QtGui.QWidget):
         fop = open("latest_grb_packet.xml",'r')
         xml = fop.read()
         fop.close()
-        gcnh = gcn.GCNHandler(self,xml,self.conf)
+        gcnh = gcn.GCNHandler(self,xml,self.conf,True)
         gcnh.RiseAlert(self,True)
     def closeEvent(self):
         self.StopThreadFlag[0] = True
@@ -180,11 +180,11 @@ class MainWindow(QtGui.QMainWindow):
 		  self.show()
 
 def main():
+    log.init()
     app = QtGui.QApplication(sys.argv)
     qb = TerminalViewer(app)
     main_window = MainWindow(qb)
     sys.exit(app.exec_())
-
 
 if __name__ == '__main__':
     main()
