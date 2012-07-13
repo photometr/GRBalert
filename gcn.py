@@ -20,14 +20,14 @@ def red_to_pos(hourang):
     return hourang
 
 class GCNHandler():
-    def __init__(self, obj, data, conf):
+    def __init__(self, obj, data, conf, flag=False):
         self.conf = conf
         self.ev = event.Event()
         fop = open("latest_packet.xml",'w')
         #print data
         fop.write(data)
         fop.close()
-        self.Parse(obj, data)
+        self.Parse(obj, data, flag)
     def CalcAlt(self,ev):
         curtime = datetime.now()
         Gst = sidereal.SiderealTime.fromDatetime(curtime)
@@ -42,24 +42,28 @@ class GCNHandler():
 	  return True
 	else:
 	  return False
-    def RiseAlert(self,obj,flag):
+    def RiseAlert(self,obj,flag=False):
         #flag show whether it's called from GUI
         #ev.CalcDate()
         ev = self.ev
         h = round(self.CalcAlt(ev),2)
         secz = round(1.0/math.cos(math.pi*0.5-math.radians(h)),2)
-        if not self.CheckCoordErr(ev):
+        if not self.CheckCoordErr(ev) and not flag:
 	    log.log('Source position err is too big')
+	    return 0
+        if ev.GetTimeDelta() > 86400 and not flag: #if the event is too old
+	    log.log('Time delta is too big')
 	    return 0
         if h > self.conf.alt_limit or flag:
             nicedate = ev.GetFormDate()
 	    GenHTML(ev.datestr,ev.RA,ev.DEC,nicedate,h,secz,ev.telescope,ev.Cerr)
 	    if ev.link != "":
+	      log.log(ev.link)
 	      webbrowser.open_new_tab(ev.link)
 	    webbrowser.open_new_tab(os.path.join(os.getcwd(),self.conf.htmlfile))
-        if not flag:        
-            obj.SetAlert()
-    def Parse(self,obj,data):
+            if not flag:
+              obj.SetAlert()
+    def Parse(self,obj,data,flag=False):
       isVOEvent = False
       pars = lxml.html.etree.HTMLParser()
       tree = lxml.html.etree.parse(StringIO(data),pars)
@@ -77,7 +81,7 @@ class GCNHandler():
 	      if parent[i].attrib.get("name") == 'Packet_Type':
 		ev.SetType(parent[i].attrib.get("value"))
 		log.log('Caught event type '+str(ev.etype))
-		if not ev.IsInteresting():
+		if not ev.IsInteresting() and flag == False:
 		  print "Not interesting event"
 		  return 0
       for parent in tree.getiterator():
@@ -97,5 +101,5 @@ class GCNHandler():
       fop = open("latest_grb_packet.xml",'w')
       fop.write(data)
       fop.close()
-      self.RiseAlert(obj,True)
+      self.RiseAlert(obj,flag)
  

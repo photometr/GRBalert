@@ -238,6 +238,8 @@ s13 = """
     <br>
     <a href="http://gcn.gsfc.nasa.gov/gcn3_archive.html">GCN Circulars</a>
     <br>
+    <a href="http://gcn.gsfc.nasa.gov/gcn_describe.html">The GCN/TAN System</a>
+    <br>
     <a href="http://cas.sdss.org/dr7/en/tools/chart/chart.asp">SDSS Finding Chart</a>
     <br>
     <a href="http://archive.stsci.edu/cgi-bin/dss_form">DSS Finding Chart</a>
