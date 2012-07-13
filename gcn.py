@@ -42,14 +42,17 @@ class GCNHandler():
 	  return True
 	else:
 	  return False
-    def RiseAlert(self,obj,flag):
+    def RiseAlert(self,obj,flag=False):
         #flag show whether it's called from GUI
         #ev.CalcDate()
         ev = self.ev
         h = round(self.CalcAlt(ev),2)
         secz = round(1.0/math.cos(math.pi*0.5-math.radians(h)),2)
-        if not self.CheckCoordErr(ev):
+        if not self.CheckCoordErr(ev) and not flag:
 	    log.log('Source position err is too big')
+	    return 0
+        if ev.GetTimeDelta() > 86400 and not flag: #if the event is too old
+	    log.log('Time delta is too big')
 	    return 0
         if h > self.conf.alt_limit or flag:
             nicedate = ev.GetFormDate()

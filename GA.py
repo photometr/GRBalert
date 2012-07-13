@@ -71,7 +71,6 @@ class TerminalViewer(QtGui.QWidget):
         xml = fop.read()
         fop.close()
         gcnh = gcn.GCNHandler(self,xml,self.conf,True)
-        gcnh.RiseAlert(self,True)
     def closeEvent(self):
         self.StopThreadFlag[0] = True
         QtGui.qApp.quit()
