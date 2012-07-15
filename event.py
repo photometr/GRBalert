@@ -28,7 +28,6 @@ class Event():
                        101 : "SuperAGILE_GRB_POS_GROUND",
                        102 : "SuperAGILE_GRB_POS_REFINED",
                        #109 : "AGILE_GRB_POS_TEST",##################################
-                       110 : "FERMI_GBM_ALERT",
                        111 : "FERMI_GBM_FLT_POS",
                        112 : "FERMI_GBM_GND_POS",
                        115 : "FERMI_GBM_FINAL_POS",
