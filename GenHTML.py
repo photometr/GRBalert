@@ -1,4 +1,5 @@
 import sidereal
+import math
 # -*- coding: utf-8 -*-
 
 s1 = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
@@ -279,9 +280,9 @@ def GenHTML(datestr,RA,DEC,nicedate,h,secz,telescope,pos_err):
       Err = " ± "+ str(pos_err)
     dms = sidereal.MixedUnits( (60,60) )
     RAlist = dms.singleToMix( RA/15.0 )
-    DEClist = dms.singleToMix( DEC )
+    DEClist = dms.singleToMix( abs(DEC) )
     RAnice = str(RAlist[0])+"h "+str(RAlist[1])+"m "+str(int(round(RAlist[2])))+"s"+ RADEC_err_min
-    DECnice = str(DEClist[0])+"° "+str(DEClist[1])+"' "+str(int(round(DEClist[2])))+'"'+ RADEC_err_min
+    DECnice = str(math.copysign(DEClist[0],DEC))+"° "+str(DEClist[1])+"' "+str(int(round(DEClist[2])))+'"'+ RADEC_err_min
     s = s1 + datestr + s2+ telescope + s3 + str(RA) + "&dec=" + str(DEC) + s4
     s = s + datestr + s5 + datestr + s6 #FIXME second is updated
     s = s + str(RA) + Err + s7 + str(DEC) + Err + s8 + nicedate
