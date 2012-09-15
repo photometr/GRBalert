@@ -14,7 +14,8 @@ import sys
 
 pktlen = 2048
 maxpktlen = 30000
-imaldiff = 200 #if doesn't receive iamalive in this time diff (sec) then reconnect
+imaldiff = 120 #if doesn't receive iamalive in this time diff (sec) then reconnect
+timoutifnoconn = 5 #if couldnt establish connection with socket will sleep for this timeout
 
 def makeResp(xml):
   tree = etree.fromstring(xml) 
@@ -68,6 +69,7 @@ def voserver_thread(obj,StopThreadFlag):
       except socket.error, msg:
 	continue
       try:
+	time.sleep(timoutifnoconn)
 	s.connect(sa)
       except socket.error, msg:
 	s = None
@@ -84,16 +86,17 @@ def voserver_thread(obj,StopThreadFlag):
 	#try to connect to another server
 	break
       try:
-        data = s.recv(4)
+	data = s.recv(4)
       except:
-	pass
+	log.log('Timeout on voevent socket')
+	break
       try:
 	dl = struct.unpack('>I', data)[0] #big-endian 4 byte int
       except:
 	log.log("Error: Unpack can't be made")
 	break
       if dl > 30000:
-	log.log("Too much data received = " + str(dl))
+	log.log("Too many data received = " + str(dl))
 	break
       read = 0
       xml = ""
