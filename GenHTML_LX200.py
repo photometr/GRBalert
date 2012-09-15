@@ -1,6 +1,6 @@
+# -*- coding: utf-8 -*-
 import sidereal
 import math
-# -*- coding: utf-8 -*-
 
 s1 = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
