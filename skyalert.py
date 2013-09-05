@@ -103,7 +103,10 @@ class Handler():
     def __init__(self,obj,data,conf):
         self.Parse(obj,data,conf)
     def CalcAlt(self,ev,conf):
-        curtime = datetime.now()
+        if self.conf.is_utc:
+           curtime = datetime.now()
+        else:
+           curtime = datetime.utcnow()
         Gst = sidereal.SiderealTime.fromDatetime(curtime)
         Lst = Gst.lst(math.radians(conf.longitude))
         Lst = Lst.hours * 15 #local siderial time - in degrees

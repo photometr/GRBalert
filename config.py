@@ -10,6 +10,7 @@ class Config():
       self.latitude = config.getfloat('location', 'latitude')
       self.altitude = config.getfloat('location', 'altitude')
       self.coorerr = config.getfloat('location', 'coorerr')
+      self.is_utc  = config.getbool('location', 'is_utc')
       self.alt_limit = config.getfloat('GRBparams', 'alt_limit')
       self.htmlfile = config.get('info', 'htmlfile')
       self.aboutfile = config.get('info', 'aboutfile')

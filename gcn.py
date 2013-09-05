@@ -29,7 +29,10 @@ class GCNHandler():
         fop.close()
         self.Parse(obj, data, flag)
     def CalcAlt(self,ev):
-        curtime = datetime.now()
+        if self.conf.is_utc:
+           curtime = datetime.now()
+        else:
+           curtime = datetime.utcnow()
         Gst = sidereal.SiderealTime.fromDatetime(curtime)
         Lst = Gst.lst(math.radians(self.conf.longitude))
         Lst = Lst.hours * 15 #local siderial time - in degrees
