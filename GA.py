@@ -6,10 +6,10 @@ Created on Fri Apr 29 23:10:44 2011
 @author: Dmitriy Blinov
 """
 import sys,os
-from PyQt4 import QtGui
-from PyQt4.QtCore import SLOT
-from PyQt4.QtCore import SIGNAL
-from PyQt4 import QtCore
+from PySide import QtGui
+from PySide.QtCore import SLOT
+from PySide.QtCore import SIGNAL
+from PySide import QtCore
 import time
 import math
 from datetime import datetime
